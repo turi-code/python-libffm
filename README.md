@@ -8,7 +8,7 @@ Quick start
 
 ```
 git clone git@github.com:dato-code/GraphLab-Create-SDK.git sdk
-git clone git@github.com:dato-code/libffm-internal.git ffm
+git clone git@github.com:dato-code/python-libffm.git ffm
 cd ffm
 make
 ```
