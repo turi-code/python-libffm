@@ -19,16 +19,6 @@ using namespace graphlab;
 using namespace std;
 using namespace ffm;
 
-size_t get_column_index(gl_sframe sf, string colname) {
-  const auto colnames = sf.column_names();
-  for (size_t i = 0; i < colnames.size(); ++i) {
-    if (colnames[i] == colname) {
-      return i;
-    }
-  }
-  return -1;
-}
-
 ffm_problem read_sframe(gl_sframe data, std::string target, 
                         std::vector<std::string> features, 
                         size_t max_field_idx, 

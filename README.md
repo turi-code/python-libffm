@@ -17,7 +17,7 @@ To run the following examples you will also need to [register for GraphLab Creat
 
 After that, try running the basic example:
 ```
-python examples/basic.py
+ipython examples/basic.py
 ```
 
 If you want to try a less synthetic example, download the [1TB Criteo dataset](http://labs.criteo.com/downloads/download-terabyte-click-logs/). 
@@ -28,12 +28,12 @@ gzip -cd day_0.gz| head -n 1000000 > criteo-sample.tsv
 
 Next we have a sample script for performing some of the same types of feature engineering that the contest winners have been using:
 ```
-python examples/criteo_process.py
+ipython examples/criteo_process.py
 ```
 
 Train a FFM model on this data.
 ```
-python examples/criteo_sample.py
+ipython examples/criteo_sample.py
 ```
 
 You should see something like the following (which appears to be overfitting in this example):

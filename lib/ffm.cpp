@@ -22,10 +22,22 @@
 
 namespace ffm {
 
+size_t get_column_index(graphlab::gl_sframe sf, std::string colname) {
+  const auto colnames = sf.column_names();
+  for (size_t i = 0; i < colnames.size(); ++i) {
+    if (colnames[i] == colname) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+
 namespace {
 
 using namespace std;
 using namespace graphlab;
+
 
 ffm_int const kALIGNByte = 16;
 ffm_int const kALIGN = kALIGNByte/sizeof(ffm_float);
@@ -229,11 +241,18 @@ shared_ptr<ffm_model> train(
     }
 
     size_t target_col_idx = get_column_index(tr->sf, tr->target_column); 
+    // logprogress_stream << tr->target_column << " " << get_column_index(tr->sf, tr->target_column) << std::endl;
+    // logprogress_stream << flex_type_enum_to_name(tr->sf.select_column(tr->target_column).dtype()) << std::endl;
+
     std::vector<size_t> feature_col_idxs;
     for (auto col : tr->feature_columns) { 
+      // logprogress_stream << col << " " << get_column_index(tr->sf, col) << std::endl;
+      // logprogress_stream << flex_type_enum_to_name(tr->sf.select_column(col).dtype()) << std::endl;
+
       feature_col_idxs.push_back(get_column_index(tr->sf, col));
     }
 
+    
     for(ffm_int iter = 0; iter < param.nr_iters; iter++)
     {
       ffm_double tr_loss = 0;
@@ -246,8 +265,18 @@ shared_ptr<ffm_model> train(
       for (; it != rsf.end(); ++it, ++i) { 
 
         row_nodes.clear();
-        const std::vector<flexible_type>& row = *it;
+        std::vector<flexible_type> row = *it;
         const auto& yval = row[target_col_idx];
+
+        if (row[target_col_idx].get_type() != flex_type_enum::INTEGER) {
+          log_and_throw("Response must be integer type.");
+        }
+
+        if (row[target_col_idx].get_type() != flex_type_enum::INTEGER) {
+          logprogress_stream << "Column " << target_col_idx << std::endl;
+          logprogress_stream << flex_type_enum_to_name(row[target_col_idx].get_type()) << std::endl;
+          log_and_throw("Response must be integer type.");
+        }
         ffm_float y = (yval.get<flex_int>() > 0) ? 1.0f : -1.0f;
 
         for (size_t col : feature_col_idxs) {

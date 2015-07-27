@@ -12,22 +12,12 @@ namespace ffm
 {
 #endif
 
-
-
 typedef float ffm_float;
 typedef double ffm_double;
 typedef int ffm_int;
 typedef long long ffm_long;
 
-size_t get_column_index(graphlab::gl_sframe sf, std::string colname) {
-  const auto colnames = sf.column_names();
-  for (size_t i = 0; i < colnames.size(); ++i) {
-    if (colnames[i] == colname) {
-      return i;
-    }
-  }
-  return -1;
-}
+size_t get_column_index(graphlab::gl_sframe sf, std::string colname);
 
 typedef graphlab::gl_sarray blah;
 
