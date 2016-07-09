@@ -374,21 +374,28 @@ class Model {
   }
 
   std::pair<TValue, TValue> kappa_and_partial_loss(TValue y, TValue t) const {
-    TValue cost, loss, kappa;
+    TValue error, loss, kappa;
     if (false) {
       // logistic regression
-      cost = std::exp(-y * t);
-      loss = std::log(1.0 + cost);
-      kappa = -y * cost / (1.0 + cost);
+      error = std::exp(-y * t);
+      loss = std::log(1.0 + error);
+      // derivative of loss
+      // d(log(x)) => 1 / x           [1 / (1 + error)] * d(1 + error)
+      // d(exp(x)) => exp(x) * d(x)   d(-y * t) * error / (1 + error)
+      //                              -y * error / (1 + error)
+      kappa = -y * error / (1.0 + error);
     } else {
       // regression: Root Mean Square Log Error
-      auto log_y = std::log(std::max<TValue>(0.0, y) + 1);
-      auto log_t = std::log(std::max<TValue>(0.0, t) + 1);
-      auto error = log_y - log_t;
-      cost = std::pow(error, 2);
-      loss = std::log(1.0 + std::abs(error));
-      loss /= 1.0 + loss;
-      kappa = std::abs(y) * copysign(loss, error);
+      y = std::max<TValue>(0.0, y + 1.0);
+      t = std::max<TValue>(0.0, t + 1.0);
+      // log(t) - log(y) == log(t/y)
+      error = std::log(t/y);
+      // minimize this
+      loss = std::pow(error, 2);
+      // derivative of loss
+      // d(x**2)   => 2 * x * dx    2 * error * d(error)
+      // d(log(x)) => 1 / x         2 * error * y / t
+      kappa = 2 * error * y / t;
     }
     return std::make_pair(kappa, loss);
   }
