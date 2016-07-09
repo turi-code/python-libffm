@@ -311,7 +311,6 @@ class Model {
     Value coef = 1.0 / std::sqrt(k);
     std::default_random_engine generator;
     std::uniform_real_distribution<Value> uniform(0.0, 1.0);
-    std::normal_distribution<Value> normal(1.0, 0.1);
 
     auto w = back_inserter(data_);
     // for each column
@@ -327,9 +326,9 @@ class Model {
         for (Index d = k; d < k_aligned; d++) {
           *w = 0.0;
         }
-        // initialize gradients to clip(normal(1.0, 0.1), 0.6, 1.4)
+        // initialize gradients to 1.0
         for (Index d = k_aligned; d < 2 * k_aligned; d++) {
-          *w = std::max<Value>(0.6, std::min<Value>(1.4, normal(generator)));
+          *w = 1.0;
         }
       }
     }
@@ -396,6 +395,10 @@ class Model {
       // d(x**2)   => 2 * x * dx    2 * error * d(error)
       // d(log(x)) => 1 / x         2 * error * y / t
       kappa = 2 * error * y / t;
+      // make sure kappa has the right sign
+      kappa = std::copysign(kappa, t - y);
+      // clip the derivative to prevent NAN
+      kappa = std::max<TValue>(-1.0, std::min<TValue>(1.0, kappa));
     }
     return std::make_pair(kappa, loss);
   }
