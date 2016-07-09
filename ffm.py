@@ -1,22 +1,64 @@
-import graphlab as gl
+import sframe as gl
 import libffm
 
 class FFM(object):
-    def __init__(self, eta=.1, k=4, lam=0.0):
+    def __init__(self,
+                 target='target',
+                 features=None,
+                 num_features=2**18,
+                 num_factors=4,
+                 eta=0.2,
+                 lambda_=0.00002,
+                 num_iterations=15,
+                 num_epochs=1,
+                 batch_size=1,
+                 num_threads=0,
+                 early_stop=0,
+                 verbose=True,
+                 randomize=False):
         """
         Create a field-aware factorization machine model.
 
         Parameters
         ----------
+        target : str
+          The name of the column to predict. This column should be float typed.
+
+        features : list
+          The name of the feature columns that you want to use.
+
+        num_features : int
+          Number of features, including one-hot encoded features.
+
+        num_factors : int
+          Number of latent factors.
+
         eta : float
           Learning rate.
 
-        k : int
-          Number of latent factors.
-
-        lam : float
+        lambda_ : float
           Regularization parameter.
 
+        num_iterations : int
+          The number of iterations to train the model.
+
+        num_epochs : int
+          When `batch_size > 1`, defines the number of training passes over the data.
+
+        batch_size : int
+          (not implemented)
+
+        num_threads : int
+          The number of the threads to use.
+
+        verbose : boolean
+          If true, algorithm will report progress.
+
+        normalization : boolean
+          If true, the algorithm will perform instance-wise normalization.
+
+        random : boolean
+          (not implemented) If true, the rows will be shuffled prior to training.
 
         References
         ----------
@@ -26,14 +68,39 @@ class FFM(object):
         - `FFM formulation details <http://www.csie.ntu.edu.tw/~r01922136/slides/ffm.pdf>`
         - `Criteo winning submission details <http://www.csie.ntu.edu.tw/~r01922136/kaggle-2014-criteo.pdf>`
         """
-        self.m = libffm.ffm_py()
-        self.m.init_model(eta, lam, k)
+        self.target = target
+        self.features = features
+        self.num_features = num_features
+        self.num_factors = num_factors
+        self.eta = eta
+        self.lambda_ = lambda_
+        self.num_iterations = num_iterations
+        self.num_epochs = num_epochs
+        self.batch_size = batch_size
+        self.num_threads = num_threads
+        self.early_stop = early_stop
+        self.verbose = verbose
+        self.randomize = randomize
 
-    def fit(self, train, validation_set=None,
-            target='target', features=None,
-            max_feature_id=2**18,
-            nr_iters=15, nr_threads=1,
-            quiet=False):
+        self.m = libffm.ffm_py()
+        self.m.set_params({
+            'target': target,
+            'features': features,
+            'num_features': num_features,
+            'num_factors': num_factors,
+            'eta': eta,
+            'lambda_': lambda_,
+            'num_iterations': num_iterations,
+            'num_epochs': num_epochs,
+            'batch_size': batch_size,
+            'num_threads': num_threads,
+            'early_stop': early_stop,
+            'verbose': verbose,
+            'randomize': randomize,
+        })
+
+
+    def fit(self, train, validation_set=None):
         """
         Train the model.
 
@@ -48,27 +115,6 @@ class FFM(object):
         validation_set : SFrame, optional
           A validation set to use for progress reporting. This should have the
           same format as the training data.
-
-        target : str
-          The name of the column to predict. This column should be float typed.
-
-        features : list
-          The name of the feature columns that you want to use.
-
-        nr_iters : int
-          The number of iterations to train the model.
-
-        nr_threads : int
-          The number of the threads to use.
-
-        quiet : boolean
-          If true, algorithm will report progress.
-
-        normalization : boolean
-          If true, the algorithm will perform instance-wise normalization.
-
-        random : boolean
-          If true, the rows will be shuffled prior to training.
 
         Returns
         -------
@@ -87,17 +133,28 @@ class FFM(object):
 
         """
 
-        if target not in train.column_names():
-            raise ValueError, "Target column `{0}` not found in dataset.".format(target)
+        train, validation_set = self._check_sframe(train, validation_set)
+        self.m.fit(train, validation_set)
+
+    def fit_partial(self, train, validation_set=None):
+        train, validation_set = self._check_sframe(train, validation_set)
+        self.m.fit_partial(train, validation_set)
+
+    def _check_sframe(self, train, validation_set=None):
+        if self.features is None:
+            self.features = train.column_names()
+            if self.target in self.features: self.features.remove(self.target)
+        features = set(self.features)
+        if self.target not in train.column_names():
+            raise ValueError("Target column `{0}` not found in dataset.".format(self.target))
+        if features & set(train.column_names()) != features:
+            raise ValueError("Training data missing feature columns.")
         if validation_set is not None:
-            if train.column_names() != validation_set.column_names():
-                raise ValueError, "Train, validation data must have the same column names."
+            if features & set(validation_set.column_names()) != features:
+                raise ValueError("Validation data missing feature columns.")
         else:
             validation_set = train.head(0)
-        if features is None:
-            features = [c for c in train.column_names() if c is not target]
-        self.m.set_param(nr_iters, nr_threads, quiet)
-        self.m.fit(train, validation_set, target, features, max_feature_id)
+        return train, validation_set
 
     def predict(self, test):
         """

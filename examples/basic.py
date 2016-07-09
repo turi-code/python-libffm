@@ -1,4 +1,4 @@
-import graphlab as gl
+import sframe as gl
 import ffm
 from convert import read_libffm_file
 
@@ -14,10 +14,18 @@ valid = valid[train.column_names()]
 train.save('examples/small.tr.sframe')
 valid.save('examples/small.te.sframe')
 
-features = [c for c in train.column_names() if c != 'y']
+# train = gl.SFrame('examples/small.tr.sframe')
+# valid = gl.SFrame('examples/small.te.sframe')
+print(train)
+
+features = train.column_names()
+features.remove('y')
+print(features)
 
 # Train a model
-m = ffm.FFM()
-m.fit(train, valid, target='y', features=features, nr_iters=15)
+m = ffm.FFM(target='y', features=features, eta=0.1, lambda_=0.0)
+m.fit(train, valid)
+
+# print(valid)
 # yhat = m.predict(valid)
-# print yhat
+# print(yhat)

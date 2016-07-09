@@ -1,4 +1,4 @@
-import graphlab as gl
+import sframe as gl
 
 def read_libffm_file(filename):
     """
