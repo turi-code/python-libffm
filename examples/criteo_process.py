@@ -11,7 +11,7 @@ if not os.path.exists(outfile):
 else:
     sf = gl.SFrame(outfile)
 
-# Quick in-browser visualization using Dato's Canvas
+# Quick in-browser visualization using Turi's Canvas
 sf.show()
 
 # Create a random train/test split
@@ -56,4 +56,3 @@ for c in categ:
 
 train.save('criteo_train_transformed')
 valid.save('criteo_valid_transformed')
-

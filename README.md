@@ -7,13 +7,13 @@ Quick start
 -----------
 
 ```
-git clone git@github.com:dato-code/GraphLab-Create-SDK.git sdk
-git clone git@github.com:dato-code/python-libffm.git ffm
+git clone git@github.com:turi-code/GraphLab-Create-SDK.git sdk
+git clone git@github.com:turi-code/python-libffm.git ffm
 cd ffm
 make
 ```
 
-To run the following examples you will also need to [register for GraphLab Create](https://dato.com/products/create/quick-start-guide.html). This software is free for non-commercial use and has a 30 day free trial otherwise.
+To run the following examples you will also need to [register for GraphLab Create](https://turi.com/products/create/quick-start-guide.html). This software is free for non-commercial use and has a 30 day free trial otherwise.
 
 After that, try running the basic example:
 ```
@@ -51,7 +51,7 @@ PROGRESS:    5      0.05484      0.16034
 Usage
 -----
 
-The package makes it easy to train models directly from [SFrames](https://dato.com/products/create/docs/generated/graphlab.SFrame.html#graphlab.SFrame). 
+The package makes it easy to train models directly from [SFrames](https://turi.com/products/create/docs/generated/graphlab.SFrame.html#graphlab.SFrame). 
 
 ```
 import ffm
@@ -69,9 +69,9 @@ Each column is interpreted as a separate "field" in the model. Only dict columns
 Code
 ----
 
-- `libfmm.cpp`: uses C++ macros provided by [Dato's SDK](https://github.com/dato-code/GraphLab-Create-SDK) to wrap `libffm`'s methods as Python classes and methods.
+- `libfmm.cpp`: uses C++ macros provided by [Turi's SDK](https://github.com/turi-code/GraphLab-Create-SDK) to wrap `libffm`'s methods as Python classes and methods.
 - `fmm.py`: a scikit-learn-style wrapper.
-- `lib/`: the [original library](http://www.csie.ntu.edu.tw/~r01922136/libffm/), where cout statements have been replaced with Dato's `progress_stream` to allow progress printing to Python.
+- `lib/`: the [original library](http://www.csie.ntu.edu.tw/~r01922136/libffm/), where cout statements have been replaced with Turi's `progress_stream` to allow progress printing to Python.
 - `examples/`: example scripts for training  models using the sample data provided with the original package as well as with data similar to Kaggle's [criteo competition](https://www.kaggle.com/c/criteo-display-ad-challenge).
 
 More details
