@@ -69,8 +69,8 @@ Each column is interpreted as a separate "field" in the model. Only dict columns
 Code
 ----
 
-- `libfmm.cpp`: uses C++ macros provided by [Turi's SDK](https://github.com/turi-code/GraphLab-Create-SDK) to wrap `libffm`'s methods as Python classes and methods.
-- `fmm.py`: a scikit-learn-style wrapper.
+- `libffm.cpp`: uses C++ macros provided by [Turi's SDK](https://github.com/turi-code/GraphLab-Create-SDK) to wrap `libffm`'s methods as Python classes and methods.
+- `ffm.py`: a scikit-learn-style wrapper.
 - `lib/`: the [original library](http://www.csie.ntu.edu.tw/~r01922136/libffm/), where cout statements have been replaced with Turi's `progress_stream` to allow progress printing to Python.
 - `examples/`: example scripts for training  models using the sample data provided with the original package as well as with data similar to Kaggle's [criteo competition](https://www.kaggle.com/c/criteo-display-ad-challenge).
 
